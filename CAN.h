@@ -1,3 +1,6 @@
+#ifndef CAN_H_
+#define CAN_H_
+
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,7 +9,6 @@
 #include "inc/hw_can.h"
 #include "inc/hw_uart.h"
 #include "inc/hw_ints.h"
-//#include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 #include "driverlib/can.h"
 #include "driverlib/gpio.h"
@@ -26,8 +28,19 @@
 #define GPIO_PORTD_BASE         0x40007000  // GPIO Port D
 
 
+/*description: CAN HANDLER*/
 void CANIntHandler(void);
+
+/*description: CAN initialization*/
 void CAN_INIT(void);
+
+/*description: sending using tx1*/
 void CAN_Send1(uint8 data);
+
+/*description: sending using tx2*/
 void CAN_Send2(uint8 data);
+
+/*description: Receive from CAN*/
 uint8 CAN_Receiver(void);
+
+#endif

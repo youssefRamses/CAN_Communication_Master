@@ -1,12 +1,8 @@
 /******************************************************************************
- *
  * Module: Port
- *
  * File Name: Port_Cfg.h
- *
  * Description: Pre-Compile Configuration Header file for TM4C123GH6PM Microcontroller - Port Driver
- *
- * Author: Michael Samir 
+ * Author: Team 8
  ******************************************************************************/
 
 #ifndef PORT_CFG_H

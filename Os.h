@@ -1,12 +1,8 @@
  /******************************************************************************
- *
  * Module: Os
- *
  * File Name: Os.h
- *
  * Description: Header file for Os Scheduler.
- *
- * Author: team 8
+ * Author: Team 8
  ******************************************************************************/
 
 #ifndef OS_H_
@@ -15,10 +11,8 @@
 #include "Std_Types.h"
 #include "CAN.h"
 
-
 /* Timer counting time in ms */
-#define OS_BASE_TIME 50
-
+#define OS_BASE_TIME 10
 
 /* Description: 
  * Function responsible for:

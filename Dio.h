@@ -1,40 +1,12 @@
  /******************************************************************************
- *
  * Module: Dio
- *
  * File Name: Dio.h
- *
  * Description: Header file for TM4C123GH6PM Microcontroller - Dio Driver
- *
- * Author: mihcael samir
+ * Author: Team 8
  ******************************************************************************/
 
 #ifndef DIO_H
 #define DIO_H
-
-/* Id for the company in the AUTOSAR
- * for example michael samir's ID = 1000 :) */
-#define DIO_VENDOR_ID    (1000U)
-
-/* Dio Module Id */
-#define DIO_MODULE_ID    (120U)
-
-/* Dio Instance Id */
-#define DIO_INSTANCE_ID  (0U)
-
-/*
- * Module Version 1.0.0
- */
-#define DIO_SW_MAJOR_VERSION           (1U)
-#define DIO_SW_MINOR_VERSION           (0U)
-#define DIO_SW_PATCH_VERSION           (0U)
-
-/*
- * AUTOSAR Version 4.0.3
- */
-#define DIO_AR_RELEASE_MAJOR_VERSION   (4U)
-#define DIO_AR_RELEASE_MINOR_VERSION   (0U)
-#define DIO_AR_RELEASE_PATCH_VERSION   (3U)
 
 /*
  * Macros for Dio Status
@@ -45,29 +17,8 @@
 /* Standard AUTOSAR types */
 #include "Std_Types.h"
 
-/* AUTOSAR checking between Std Types and Dio Modules */
-#if ((STD_TYPES_AR_RELEASE_MAJOR_VERSION != DIO_AR_RELEASE_MAJOR_VERSION)\
- ||  (STD_TYPES_AR_RELEASE_MINOR_VERSION != DIO_AR_RELEASE_MINOR_VERSION)\
- ||  (STD_TYPES_AR_RELEASE_PATCH_VERSION != DIO_AR_RELEASE_PATCH_VERSION))
-  #error "The AR version of Std_Types.h does not match the expected version"
-#endif
-
 /* Dio Pre-Compile Configuration Header file */
 #include "Dio_Cfg.h"
-
-/* AUTOSAR Version checking between Dio_Cfg.h and Dio.h files */
-#if ((DIO_CFG_AR_RELEASE_MAJOR_VERSION != DIO_AR_RELEASE_MAJOR_VERSION)\
- ||  (DIO_CFG_AR_RELEASE_MINOR_VERSION != DIO_AR_RELEASE_MINOR_VERSION)\
- ||  (DIO_CFG_AR_RELEASE_PATCH_VERSION != DIO_AR_RELEASE_PATCH_VERSION))
-  #error "The AR version of Dio_Cfg.h does not match the expected version"
-#endif
-
-/* Software Version checking between Dio_Cfg.h and Dio.h files */
-#if ((DIO_CFG_SW_MAJOR_VERSION != DIO_SW_MAJOR_VERSION)\
- ||  (DIO_CFG_SW_MINOR_VERSION != DIO_SW_MINOR_VERSION)\
- ||  (DIO_CFG_SW_PATCH_VERSION != DIO_SW_PATCH_VERSION))
-  #error "The SW version of Dio_Cfg.h does not match the expected version"
-#endif
 
 /* Non AUTOSAR files */
 #include "Common_Macros.h"
@@ -173,12 +124,6 @@ typedef struct Dio_ConfigType
  *                      Function Prototypes                                    *
  *******************************************************************************/
 
-/* Function for DIO read Channel API */
-Dio_PortLevelType Dio_ReadPort(Dio_PortType PortId);
-
-/* Function for DIO write Channel API */
-void Dio_WritePort(Dio_PortType PortId, Dio_PortLevelType Level);
-
 /* Function for DIO read Port API */
 Dio_LevelType Dio_ReadChannel(Dio_ChannelType ChannelId);
 
@@ -187,16 +132,6 @@ void Dio_WriteChannel(Dio_ChannelType ChannelId, Dio_LevelType Level);
 
 /* Function for DIO Initialization API */
 void Dio_Init(const Dio_ConfigType * ConfigPtr);
-
-#if (DIO_FLIP_CHANNEL_API == STD_ON)
-/* Function for DIO flip channel API */
-Dio_LevelType Dio_FlipChannel(Dio_ChannelType ChannelId);
-#endif
-
-/* Function for DIO Get Version Info API */
-#if (DIO_VERSION_INFO_API == STD_ON)
-void Dio_GetVersionInfo(Std_VersionInfoType *versioninfo);
-#endif
 
 
 /*******************************************************************************

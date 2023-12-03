@@ -1,27 +1,29 @@
- /******************************************************************************
- *
- * Module: Application
- *
+  /******************************************************************************
+ * Module: application
  * File Name: App.c
- *
- * Description: Source file for Application Tasks.
- *
- * Author: team 8 
+ * Description: Header file for Application Tasks.
+ * Author: Team 8 
  ******************************************************************************/
 
 #include "App.h"
+#include "Button.h"
+#include "Led.h"
 #include "Dio.h"
 #include "Port.h"
-#include "CAN.h"
+#include  "CAN.h"
+#include "Os.h"
 
+/*Counter used to set the colour state*/
+uint8 color_count=0; 
 
-/*enum instance for states*/
-enum states s = normal ;
-/*global variables for reading switches states */
-static uint8 sw1=button_released; 
-static uint8 sw2=button_released;
+/*Counter for how many times the button was pressed to set the state*/
+uint8 btn_count=0;
+/*Variable that receives the data from the can*/
+uint8 data=0;
+/*Variable that sets the button count either with 1 or 2  */
+uint8 dummy=0;
 
-
+uint8 status=0;
 
 /************************************************************************************
 * Function Name: Init_Task
@@ -31,109 +33,182 @@ static uint8 sw2=button_released;
 * outputs : None
 * Description: Function to Initialize Dio, CAN and PORTS
 ************************************************************************************/
+
 void Init_Task(void)
 {
     /* Initialize Port Driver */
     Port_Init(&Port_pinConfigurationSet); 
     /* Initialize Dio Driver */
     Dio_Init(&Dio_Configuration);
-    /*initialize CAN driver */
+    /* Initialize CAN */
     CAN_INIT();
 
 }
 
 
+
 /************************************************************************************
-* Function Name: t_state_machine
+* Function Name: Red_state
 * Sync/Async: Synchronous
-* Reentrancy: reentrant
+* Reentrancy:  reentrant
 * inputs : None
 * outputs : None
-* Description: function read switche values and change the state of the sender ECU
+* Description: Function to Turn Red Led on
 ************************************************************************************/
-void t_state_machine (void)
 
+void Red_state (void){
+        /* Turn red led on */
+        Dio_WriteChannel(DioConf_LED1_CHANNEL_ID_INDEX,LED_ON);  
+        /* Turn blue led off */
+        Dio_WriteChannel(DioConf_LED2_CHANNEL_ID_INDEX,LED_OFF);
+        /* Turn green led off */
+        Dio_WriteChannel(DioConf_LED3_CHANNEL_ID_INDEX,LED_OFF);
+}
+
+/************************************************************************************
+* Function Name: Green_state
+* Sync/Async: Synchronous
+* Reentrancy:  reentrant
+* inputs : None
+* outputs : None
+* Description: Function to Turn Green Led on
+************************************************************************************/
+
+void Green_state (void){
+        /* Turn red led off */
+        Dio_WriteChannel(DioConf_LED1_CHANNEL_ID_INDEX,LED_OFF);  
+        /* Turn blue led off */
+        Dio_WriteChannel(DioConf_LED2_CHANNEL_ID_INDEX,LED_OFF);
+        /* Turn green led on */
+        Dio_WriteChannel(DioConf_LED3_CHANNEL_ID_INDEX,LED_ON);
+        
+  
+}
+
+/************************************************************************************
+* Function Name: Blue_state
+* Sync/Async: Synchronous
+* Reentrancy:  reentrant
+* inputs : None
+* outputs : None
+* Description: Function to Turn blue Led on
+************************************************************************************/
+
+void Blue_state (void){
+        /* Turn red led off */
+        Dio_WriteChannel(DioConf_LED1_CHANNEL_ID_INDEX,LED_OFF);  
+        /* Turn blue led on */
+        Dio_WriteChannel(DioConf_LED2_CHANNEL_ID_INDEX,LED_ON);
+        /* Turn green led off */
+        Dio_WriteChannel(DioConf_LED3_CHANNEL_ID_INDEX,LED_OFF);
+}
+
+/***************************************************************************************
+* Function Name: App_Task
+* Sync/Async: Synchronous
+* Reentrancy:  reentrant
+* inputs : None
+* outputs : None
+* Description: Function to set the state based on the button counter and colour counter
+****************************************************************************************/
+
+void App_Task(void)
 {
-  /*check the value of the switch 1 only when it is released */
-if( sw1==button_released) 
-    sw1 = Dio_ReadChannel(DioConf_SW1_CHANNEL_ID_INDEX);
-    
-/*check the value of the switch 2 only when it is released */
-if (sw2==button_released)
-    sw2 = Dio_ReadChannel(DioConf_SW2_CHANNEL_ID_INDEX);
+ 
+  switch(status){
+  
+  case r1: 
+          if(color_count<3){
+            /*Increase the colour count by 1*/
+            color_count++;
+          }
+          else { color_count=0; }
+          colors(color_count); 
+          dummy=0;
+          
+          break;
+          
+  case rt: 
+          if(color_count ==0 || color_count==3 ){
+          color_count=2;
+          }
+   
+          /*if green set it to red*/
+          else if (color_count==1){
+          color_count=3;
+          }
+   
+          /*if blue set it to green*/
+          else if(color_count==2){
+          color_count=1;
+          }
+          colors(color_count);
+          dummy=0;
+          
+          break;
+  
+  case r2: 
+           color_count=0;
+           colors(color_count);
+           dummy=0;
+           break;
+  }
+      status=r;   
+}
+
+/***************************************************************************************
+* Function Name: Receive_state
+* Sync/Async: Synchronous
+* Reentrancy:  reentrant
+* inputs : None
+* outputs : None
+* Description: Function to receive from CAN
+****************************************************************************************/
 
 
-/*checking if switch 1 is released then check switch 2 is released or pressed */
-    if (sw1==button_released)
-  {
-    /*if switch 2 is released so the both switches are released so stay at normal state*/
-    if (sw2==button_released) 
-    {
-      s = normal ;
-    }
-    /*if switch 2 is pressed so switch 2 is only pressed so state change to button2_pressed*/
-    else if (sw2==button_pressed)
-    {
-      s = button2_pressed;
-    }
-    
-  }
-  /*checking if switch 1 is pressed then check switch 2 is released or pressed */
-  else if (sw1 ==button_pressed)
-  {
-    /*if switch 2 is releaased so switch 1 is only pressed so state change to button1_pressed*/
-     if (sw2==button_released) 
-    {
-      s = button1_pressed ;
-    }
-    /*if switch 2 is pressed so the both switches are pressed and state changes to both_pressed*/
-    else if (sw2==button_pressed)
-    {
-      s = both_pressed;
-    }
-  }
+void Receive_state (void){
+  /*receive data*/
+  data  = CAN_Receiver();
+          /*check if data = 1*/
+            if (data==1){
+            dummy++;  
+              /*check number of presses*/
+              if(dummy==1){
+                           status =r1;
+                           }
+              else if(dummy==2){
+                status=rt;
+                }
+            }
+          
+            /*if data =2 it means that both buttons where pressed*/
+            if(data ==2){
+             status = r2;
+             
+            }
+  
 }
 
 
-
-/************************************************************************************
-* Function Name: transmit_task
-* Sync/Async: Synchronous
-* Reentrancy: reentrant
-* inputs : None
-* outputs : None
-* Description: function called every 500 ms so sending a messaage through can to both ECU 2&3 
-               according to the state
-************************************************************************************/
-void transmit_task(void) 
-{
-   /*all cases will send can messages to both tx1 &tx2  
-     sending 0 means nothing pressed , 1 means pressed , 2 means both pressed */
-    switch (s)
-    {
-       /*case normal means no switches is pressed */
-       case normal:
-          CAN_Send1(0);
-          CAN_Send2(0);
-          break ;
-       /*case button1_pressed means only button 1 is pressed */
-       case button1_pressed: 
-         CAN_Send1(1);
-         CAN_Send2(0);
-         break;
-        /*case button2_pressed means only button 2 is pressed */ 
-       case button2_pressed: 
-         CAN_Send1(0);
-         CAN_Send2(1);
-         break;
-         /*case both_pressed means both switches pressed */
-       case both_pressed: 
-         CAN_Send1(2);
-         CAN_Send2(2);
-         break;
-    }
-    
-    /*after sending can messages return switch 1&2 global variables as released */
-    sw1= button_released ;
-    sw2= button_released;
+void colors(uint8 x){
+  
+  
+  switch (x){
+        
+        /*red state*/
+        case 0:
+        case 3: Red_state();
+                color_count=0;
+                break;
+                
+        /*Green state*/        
+        case 1: Green_state();
+                break;
+                
+        /*blue state*/        
+        case 2: Blue_state();
+                break;      
+  
+  
+}
 }

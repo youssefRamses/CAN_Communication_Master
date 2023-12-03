@@ -1,12 +1,8 @@
 /******************************************************************************
- *
  * Module: Port
- *
  * File Name: Port_PBcfg.c
- *
  * Description: Post Build Configuration Source file for TM4C123GH6PM Microcontroller - Port Driver
- *
- * Author: Michale Samir 
+ * Author: Team 8
  ******************************************************************************/
 
 #include "Port.h"

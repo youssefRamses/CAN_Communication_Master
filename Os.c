@@ -1,12 +1,8 @@
  /******************************************************************************
- *
  * Module: Os
- *
  * File Name: Os.c
- *
  * Description: Source file for Os Scheduler.
- *
- * Author: team 8
+ * Author: Team 8
  ******************************************************************************/
 
 #include "Os.h"
@@ -15,6 +11,9 @@
 #include "Led.h"
 #include "Gpt.h"
 #include "Dio.h"
+#include "App.h"
+
+
 /* Enable IRQ Interrupts ... This Macro enables IRQ interrupts by clearing the I-bit in the PRIMASK. */
 #define Enable_Interrupts()    __asm("CPSIE I")
 
@@ -27,7 +26,19 @@ static uint32 g_Time_Tick_Count = 0;
 /* Global variable to indicate the the timer has a new tick */
 static uint8 g_New_Time_Tick_Flag = 0;
 
-/*********************************************************************************************/
+/* counter for number of button presses*/
+extern  uint8 btn_count;
+
+
+/***********************************************************************************************************************
+* Function Name: Os_start
+* Sync/Async: Synchronous
+* Reentrancy:  Non reentrant
+* inputs : None
+* outputs : None
+* Description: function to enable the interrupts and initializes the ports, systick and finally executes the scheduler
+***********************************************************************************************************************/
+
 void Os_start(void)
 {
     /* Global Interrupts Enable */
@@ -40,7 +51,7 @@ void Os_start(void)
     SysTick_SetCallBack(Os_NewTimerTick);
 
     /* Start SysTickTimer to generate interrupt every 20ms */
-    SysTick_Start(OS_BASE_TIME);
+  SysTick_Start(OS_BASE_TIME);
 
     /* Execute the Init Task */
     Init_Task();
@@ -49,7 +60,17 @@ void Os_start(void)
     Os_Scheduler();
 }
 
-/*********************************************************************************************/
+
+/***********************************************************************************************************************
+* Function Name: Os_NewTimerTick
+* Sync/Async: Synchronous
+* Reentrancy:  Non reentrant
+* inputs : None
+* outputs : None
+* Description: function to increment the timer count to reach the desired value and set the flag
+***********************************************************************************************************************/
+
+
 void Os_NewTimerTick(void)
 {
     /* Increment the Os time by OS_BASE_TIME */
@@ -59,32 +80,42 @@ void Os_NewTimerTick(void)
     g_New_Time_Tick_Flag = 1;
 }
 
-/*********************************************************************************************/
+
+/*******************************************************************************************************************************
+* Function Name: Os_scheduler
+* Sync/Async: Synchronous
+* Reentrancy:  Non reentrant
+* inputs : None
+* outputs : None
+* Description: Function to manage the states based on a timer each 10ms it receives and every 1000ms it executes the app task
+*******************************************************************************************************************************/
 
 void Os_Scheduler(void)
 {
+    /*turn red led on*/
+          Red_state();       
     while(1)
     {
-        
-	/* Code is only executed in case there is a new timer tick()=50ms */
-	if(g_New_Time_Tick_Flag == 1)
-	{ 
-            /*checking switches states every 50 ms*/
-	    t_state_machine();
-           
-            /*sending can messeges through transmit task function every 500ms*/
-          if (g_Time_Tick_Count/500 ==1)
-          {
-            transmit_task();
-            /*put the count =0 to start new time*/
-            g_Time_Tick_Count = 0;
-          }
-          /*lowering our global variable flag to allow excuting code when a new time slot pass*/
-          g_New_Time_Tick_Flag = 0;
+        /*check if 10 ms is finished */
+        if(g_New_Time_Tick_Flag == 1)
+	{
+            /*receive every 10ms*/
+            if(g_Time_Tick_Count %10==0){     
+            
+              /*receive state*/
+              Receive_state(); 
+          /*check if the 1000ms has passed*/
+            if(g_Time_Tick_Count == 1000){
+            /*exceute app*/
+            App_Task();
+            /*reset btn count and timer */
+            btn_count=0;
+            g_Time_Tick_Count=0;
           
-	}
+          }
+          /*erase flag*/
+          g_New_Time_Tick_Flag=0;
+          }
+        }
     }
-
 }
-/*********************************************************************************************/
-

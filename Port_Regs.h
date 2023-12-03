@@ -1,12 +1,8 @@
  /******************************************************************************
- *
  * Module: Port
- *
  * File Name: Port_Regs.h
- *
  * Description: Header file for TM4C123GH6PM Microcontroller - Port Driver Registers
- *
- * Author: Michael Samir 
+ * Author: Team 8
  ******************************************************************************/
 
 #ifndef PORT_REGS_H

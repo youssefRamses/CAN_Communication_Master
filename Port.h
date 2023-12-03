@@ -1,12 +1,8 @@
 /******************************************************************************
- *
  * Module: Port
- *
  * File Name: Port.h
- *
  * Description: Header file for TM4C123GH6PM Microcontroller - Port Driver
- *
- * Author: Michael Samir 
+ * Author: Team 8
  ******************************************************************************/
 
 #ifndef PORT_H

@@ -1,12 +1,8 @@
  /******************************************************************************
- *
  * Module: Gpt
- *
  * File Name: Gpt.h
- *
  * Description: Header file for TM4C123GH6PM Microcontroller - SysTick Timer Driver.
- *
- * Author: michael samir
+ * Author: Team 8
  ******************************************************************************/
 
 #ifndef GPT_H

@@ -22,12 +22,6 @@
 /* Toggle a certain bit in any register */
 #define TOGGLE_BIT(REG,BIT) (REG^=(1<<BIT))
 
-/* Rotate right the register value with specific number of rotates */
-#define ROR(REG,num) ( REG = (REG>>num) | (REG << ((sizeof(REG) * 8)-num)) )
-
-/* Rotate left the register value with specific number of rotates */
-#define ROL(REG,num) ( REG = (REG<<num) | (REG >> ((sizeof(REG) * 8)-num)) )
-
 /* Check if a specific bit is set in any register and return true if yes */
 #define BIT_IS_SET(REG,BIT) ( REG & (1<<BIT) )
 

@@ -1,12 +1,8 @@
 /******************************************************************************
- *
  * Module: Port
- *
  * File Name: Port.c
- *
  * Description: Source file for TM4C123GH6PM Microcontroller - Port Driver.
- *
- * Author: Michael Samir 
+ * Author: Team 8
  ******************************************************************************/
 
 #include "Port.h"
